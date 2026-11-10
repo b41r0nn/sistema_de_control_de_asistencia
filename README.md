@@ -1,6 +1,14 @@
-# Sistema de Control de Asistencia Biométrica — REDIHOS S.A.S
+# Sistema de Control de Asistencia Biométrica
 
-> **Versión actual:** `v1.6.2-ui-legibilidad`
+> **Versión actual:** `v1.6.2-ui-legibilidad` · **Base heredada:** `hikvision_extractor` en `v1.6.3-docs`
+>
+> **Alcance actual: solo Hikvision.** Es la única integración verificada contra un
+> aparato real. Las demás marcas evaluadas, y el motivo por el que todavía no se
+> incluyen, están en [`docs/INTEGRACIONES.md`](docs/INTEGRACIONES.md).
+>
+> El diseño del soporte multi-dispositivo está en
+> [`docs/superpowers/specs/`](docs/superpowers/specs/) y su plan en
+> [`docs/superpowers/plans/`](docs/superpowers/plans/).
 
 Sistema de control de asistencia para **REPRESENTACIONES Y DISTRIBUCIONES
 HOSPITALARIAS S.A.S. (REDIHOS)**. Extrae marcaciones de un dispositivo
