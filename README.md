@@ -100,7 +100,6 @@ roles, permisos y configuración de correo desde una interfaz web.
 │   └── test_api_endpoints.py       # Tests de integración REST (17 tests)
 ├── extractor_hikvision.py          # Script/CLI de extracción ISAPI
 ├── generar_informe.py              # CLI para generar Excel desde PostgreSQL
-├── migrate_csv.py                  # CLI para migrar CSV de iVMS-4200 a PostgreSQL
 ├── docker-compose.yml              # Orquestación de desarrollo
 ├── docker-compose.prod.yml         # Orquestación de producción (HTTPS, backend interno)
 ├── backend.Dockerfile              # Imagen del backend
@@ -109,7 +108,6 @@ roles, permisos y configuración de correo desde una interfaz web.
 ├── backup.sh                       # Backup manual/automático en Linux/WSL
 ├── .env.example                    # Variables de entorno documentadas
 ├── requirements.txt                # Dependencias Python
-├── handoff_hikvision_asistencia.md # Notas internas de handoff
 └── README.md                       # Este archivo
 ```
 
@@ -669,15 +667,15 @@ frontend`), **los cambios de estáticos no se publican**.
 
 ### 9.6 Deploy en producción (Ubuntu Server — guía completa)
 
-Para migrar el sistema completo (código, base de datos y configuración) a un
-servidor Ubuntu Server con Docker, seguir la guía detallada:
+El despliegue completo en un servidor Ubuntu con Docker abarca: requisitos
+previos, empaquetado, exportación con `pg_dump`, transferencia, restauración,
+generación de claves, configuración de DNS, copias automáticas con `cron` y
+lista de verificación de seguridad.
 
-📄 [`MIGRACION_UBUNTU.md`](MIGRACION_UBUNTU.md)
-
-Incluye: requisitos previos, empaquetado en Windows, exportación con
-`pg_dump`, transferencia `scp`, restauración, generación de claves,
-configuración de DNS, backups automáticos con `cron`, troubleshooting y
-checklist de seguridad.
+> La guía paso a paso heredada del proyecto anterior describía la instalación
+> concreta de REDIHOS y se retiró de este repositorio. El procedimiento de
+> aprovisionamiento propio de esta plataforma —en sus dos modos, nube y
+> local— se define en el Hito 4 del plan de implementación.
 
 > **Importante:** en producción usar siempre `docker-compose.prod.yml`, que no
 > expone PostgreSQL ni el backend directamente, no usa bind mounts, no arranca
@@ -693,13 +691,7 @@ checklist de seguridad.
 python generar_informe.py --start 2026-07-01 --end 2026-07-31 --output reporte.xlsx
 ```
 
-### 10.2 Migrar CSV de iVMS-4200
-
-```bash
-python migrate_csv.py legacy/eventos.csv
-```
-
-### 10.3 Forzar extracción vía API
+### 10.2 Forzar extracción vía API
 
 ```bash
 # Login (en producción usar https:// y -k para cert auto-firmado)
@@ -715,7 +707,7 @@ curl -X POST https://192.168.1.250/api/extraer \
   -d '{"fecha_inicio":"2026-07-01","fecha_fin":"2026-07-31"}'
 ```
 
-### 10.4 Ver logs en tiempo real
+### 10.3 Ver logs en tiempo real
 
 ```bash
 # Stdout de contenedores
@@ -726,7 +718,7 @@ docker compose -f docker-compose.prod.yml logs -f frontend
 docker exec hikvision_backend tail -f /app/logs/app.log
 ```
 
-### 10.5 Conectarse a la base de datos
+### 10.4 Conectarse a la base de datos
 
 Las credenciales están en el `.env`:
 
@@ -805,13 +797,13 @@ ssh -L 5432:localhost:5432 usuario@ip-servidor
 
 Luego conectate como si fuera `localhost`.
 
-### 10.6 Ejecutar migraciones manualmente
+### 10.5 Ejecutar migraciones manualmente
 
 ```bash
 docker compose -f docker-compose.prod.yml exec backend alembic upgrade head
 ```
 
-### 10.7 Ejecutar tests
+### 10.6 Ejecutar tests
 
 ```bash
 # Requiere Python con dependencias instaladas (venv o global)
@@ -957,9 +949,5 @@ cp backups/.env.backup .env
 
 ## 15. Documentación adicional
 
-- `handoff_hikvision_asistencia.md`: notas internas de handoff, decisiones de
-  negocio, evidencia de pruebas y próximos pasos.
-- `MIGRACION_UBUNTU.md`: guía paso a paso para migrar el sistema a un servidor
-  Ubuntu Server con Docker en producción.
 - `http://localhost:8000/docs`: documentación interactiva de la API generada
   automáticamente por FastAPI (solo disponible en desarrollo).
